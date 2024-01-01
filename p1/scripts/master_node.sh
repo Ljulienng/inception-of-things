@@ -20,4 +20,8 @@ echo "[INFO]  Successfully installed k3s on server node"
 
 echo "alias k='kubectl'" >> /etc/profile.d/00-aliases.sh # way to add alias on all users
 
-sudo ip link add eth1 type dummy && sudo ip addr add 192.168.56.110/24 dev eth1 && sudo ip link set eth1 up
+if sudo ip link add eth1 type dummy && sudo ip addr add 192.168.56.110/24 dev eth1 && sudo ip link set eth1 up; then
+    echo -e "success, eth1 added"
+else
+    echo -e "failed, eth1 wasn't added (already added ?)"
+fi
