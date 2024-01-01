@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MEM = "1024"
+CPU = 1 
+
+Vagrant.configure("2") do |config|
+  
+  # Configuration for the first machine (Server)
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = MEM
+    vb.cpus = CPU
+  end
+
+
+
+  config.vm.define "jnguyenS" do |server|
+    server.vm.hostname = "jnguyenS"
+    server.vm.box = "generic/alpine311"
+    server.vm.synced_folder ".", "/vagrant"
+    server.vm.network "private_network", ip: "192.168.56.110"
+    server.vm.provision "shell", privileged: true, path: "scripts/master_node.sh", args: ["192.168.56.110"]
+  end
+
+  # Configuration for the second machine (ServerWorker)
+  # config.vm.define "jnguyenServerWorker" do |serverworker|
+  #   serverworker.vm.box = "alpine/alpine64"
+  #   serverworker.vm.hostname = "jnguyenServerWorker"
+  #   serverworker.vm.network "private_network", ip: "192.168.56.111"
+  #   serverworker.vm.provider "virtualbox" do |vb|
+	#   vb.gui = true
+  #     vb.memory = "512"
+  #     vb.cpus = 1
+  #   end
+  #   serverworker.vm.provision "shell", inline: <<-SHELL
+  #     # Commands to install K3s in agent mode
+  #     curl -sfL https://get.k3s.io | K3S_URL=https://192.168.56.110:6443 K3S_TOKEN=$(cat /var/lib/rancher/k3s/server/node-token) sh -
+  #   SHELL
+  # end
+
+  # SSH Key Configuration for passwordless SSH
+  # config.ssh.insert_key = false
+  # config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+
+end
