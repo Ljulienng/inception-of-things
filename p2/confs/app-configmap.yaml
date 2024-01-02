@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-one-html
+data:
+  index.html: |
+    <HTML>
+    <HEAD><TITLE>K3s nginx app 1</TITLE></HEAD>
+    <BODY>
+    <H1>Welcome to app 1</H1>
+    </BODY></HTML>
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-two-html
+data:
+  index.html: |
+    <HTML>
+    <HEAD><TITLE>K3s nginx app 2</TITLE></HEAD>
+    <BODY>
+    <H1>Welcome to app 2</H1>
+    </BODY></HTML>
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-three-html
+data:
+  index.html: |
+    <HTML>
+    <HEAD><TITLE>K3s nginx app 3</TITLE></HEAD>
+    <BODY>
+    <H1>Welcome to app 3</H1>
+    </BODY></HTML>
