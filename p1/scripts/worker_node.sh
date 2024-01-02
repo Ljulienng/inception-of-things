@@ -18,6 +18,8 @@ fi
 export INSTALL_K3S_EXEC="agent --server https://${MASTER_IP}:6443 -t ${NODE_TOKEN} --node-ip=192.168.56.111"
 # https://docs.k3s.io/quick-start
 # Download and install K3s agent
+
+echo "[INFO]  Installing k3s on worker node"
 curl -sfL https://get.k3s.io | sh -
 
 echo "[INFO]  Doing some sleep to wait for k3s to be ready"
