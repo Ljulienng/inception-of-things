@@ -3,6 +3,7 @@
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+
 echo -e "${GREEN}[INFO] Setting up our cluster with 2 worker nodes${NC}"
 if ! command -v docker &> /dev/null; then
     echo -e "${GREEN}[INFO] Installing Docker${NC}"
@@ -30,8 +31,13 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 echo -e "${GREEN}[INFO] Waiting for ArgoCD deployment...${NC}"
 kubectl wait -n argocd --for=condition=available --timeout=180s deployment/argocd-server
 
+echo -e "${GREEN}[INFO] Changing ArgoCD admin password...${NC}"
+kubectl -n argocd patch secret argocd-secret -p '{"stringData": {"admin.password": "$2a$12$HxOhjUJ3NQjMd3R4l4XGPO1LlCHuGjxu.vTBpf6SnegJdDIyvmCme", "admin.passwordMtime": "'$(date +%FT%T%Z)'"}}'
+
 echo -e "${GREEN}[INFO] Deploying application${NC}"
-kubectl apply -f ../confs/deployment.yaml 
+kubectl apply -f ../confs/deployment.yaml -n argocd
+
+sudo kubectl wait --for=condition=Ready pods --all -n argocd
 
 # echo -e "${GREEN}[INFO] Waiting for deployment and pods...${NC}"
 
@@ -48,12 +54,11 @@ kubectl apply -f ../confs/deployment.yaml
 
 sleep 10
 
-echo -e "${GREEN}[INFO] Changing ArgoCD admin password...${NC}"
-kubectl -n argocd patch secret argocd-secret -p '{"stringData": {"admin.password": "$2a$12$HxOhjUJ3NQjMd3R4l4XGPO1LlCHuGjxu.vTBpf6SnegJdDIyvmCme", "admin.passwordMtime": "'$(date +%FT%T%Z)'"}}'
 
 echo -e "${GREEN}[INFO] Starting port-forwarding for ArgoCD server...${NC}"
 kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 8080:443 &
 
+# sudo kubectl port-forward svc/wil-playground -n dev 8888:8888 2>&1 >/dev/null &
 # Wait for a user input to kill the background job
 # read -p "Press [ENTER] to stop monitoring pods..."
 # kill $BG_PID
