@@ -16,6 +16,7 @@ sudo chmod 666 /var/run/docker.sock
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 k3d cluster create argocd
 echo "alias k='kubectl'" >> ~/.bashrc # way to add alias on all users
+sleep 5
 
 export KUBECONFIG="$(k3d kubeconfig write argocd)"
 
@@ -36,7 +37,7 @@ kubectl -n argocd patch secret argocd-secret -p '{"stringData": {"admin.password
 echo -e "${GREEN}[INFO] Deploying application${NC}"
 kubectl apply -f ../confs/deployment.yaml
 
-sudo kubectl wait --for=condition=Ready pods --all
+sudo kubectl -n dev wait --for=condition=Ready pods --all
 
 
 # echo -e "${GREEN}[INFO] Waiting for deployment and pods...${NC}"

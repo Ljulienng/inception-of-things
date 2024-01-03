@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: app-one-deployment
 spec:
-  selector:
+  se  ector:
     matchLabels:
       app: app-one
   replicas: 1 # tells deployment to run 1 pods matching the template
