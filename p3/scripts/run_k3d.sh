@@ -26,7 +26,7 @@ kubectl create namespace argocd
 kubectl create namespace dev
 
 echo -e "${GREEN}[INFO] Installing ArgoCD${NC}"
-kubectl apply -n argocd -f install.yaml
+kubectl apply -n argocd -f ../confs/install.yaml
 
 echo -e "${GREEN}[INFO] Waiting for ArgoCD deployment...${NC}"
 kubectl wait -n argocd --for=condition=available --timeout=180s deployment/argocd-server
