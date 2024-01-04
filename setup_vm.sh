@@ -47,6 +47,9 @@ function check_k3d() {
   fi
 }
 
+sudo apt install curl
+sudo snap install docker
+
 # Call the functions
 check_virtualbox
 check_vagrant

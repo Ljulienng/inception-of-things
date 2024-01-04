@@ -1,24 +1,43 @@
 #!/bin/bash
 
-export EMAIL="jnguyen@student.42.fr"
-export DOMAIN="gitlab.jnguyen.com"
-export KUBECONFIG="/etc/rancher/k3s/k3s.yaml"
+# ANSI color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
 
-kubectl create namespace gitlab
+echo -e "${GREEN}Connecting to gitlab...${NC}"
+GITLAB_PASS=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode)
+sudo echo "machine gitlab.k3d.gitlab.com:2000
+login root
+password ${GITLAB_PASS}" > ~/.netrc
+sudo mv ~/.netrc /root/
+sudo chmod 600 /root/.netrc
 
-helm repo add gitlab https://charts.gitlab.io/
+# clone repo
+echo -e "${GREEN}Cloning repo...${NC}"
+sudo git clone http://gitlab.k3d.gitlab.com:2000/root/jnguyen_bonus.git git_lab
 
-helm search repo gitlab
+# clone repo from github
+sudo git clone https://github.com/Ljulienng/jnguyen_iotp3.git git_hub
 
-helm install gitlab gitlab/gitlab --set global.hosts.domain=$DOMAIN --set certmanager-issuer.email=$EMAIL --set global.hosts.https="false" --set global.ingress.configureCertmanager="false" --set gitlab-runner.install="false" -n gitlab
+echo -e "${GREEN}Copying repo github to gitlab...${NC}"
+# copy from git_hub and git_lab
+sudo mv git_hub/* git_lab/
 
-echo -n "[INFO]   Gitlab password: "
+echo -e "${GREEN}Deleting github repo...${NC}"
+sudo rm -rf git_hub/
 
-# kubectl get secret -n gitlab gitlab-gitlab-initial-root-password -o jsonpath='{.data.password}' | base64 -d; echo
-kubectl -n gitlab patch secret gitlab-gitlab-initial-root-password -p '{"stringData": {"admin.password": "$2a$12$HxOhjUJ3NQjMd3R4l4XGPO1LlCHuGjxu.vTBpf6SnegJdDIyvmCme", "admin.passwordMtime": "'$(date +%FT%T%Z)'"}}'
+echo -e "${GREEN}Pushing Gitlab repo...${NC}"
+cd git_lab
+sudo git add *
+sudo git commit -m "update"
+sudo git push
+cd ..
 
+echo -e "${GREEN}Apply deployment...${NC}"
+kubectl apply -f ./confs/deployment.yaml
 
-echo 'Waiting for gitlab to be deployed'
-kubectl wait -n gitlab --for=condition=available deployment --all --timeout=-1s
+kubectl -n dev wait --for=condition=Ready pods --all
 
-kubectl port-forward --address 0.0.0.0 svc/gitlab-webservice-default -n gitlab 8085:8181 | kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 8080:443 
+# Warning port-forward
+echo "${GREEN}PORT-FORWARD : kubectl port-forward svc/svc-wil -n dev 8888:8080${RESET}"

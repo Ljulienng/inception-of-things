@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wil-playground-app2
+  namespace: argocd
+spec:
+  destination:
+    name: ''
+    namespace: dev
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: app
+    repoURL: http://gitlab.k3d.gitlab.com:2000/root/jnguyen_bonus.git
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

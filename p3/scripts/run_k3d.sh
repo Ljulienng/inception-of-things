@@ -37,7 +37,7 @@ kubectl -n argocd patch secret argocd-secret -p '{"stringData": {"admin.password
 echo -e "${GREEN}[INFO] Deploying application${NC}"
 kubectl apply -f ../confs/deployment.yaml
 
-sudo kubectl -n dev wait --for=condition=Ready pods --all
+kubectl -n dev wait --for=condition=Ready pods --all
 
 
 # echo -e "${GREEN}[INFO] Waiting for deployment and pods...${NC}"
